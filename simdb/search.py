@@ -8,6 +8,7 @@ import importlib
 
 __author__ = 'christopher'
 
+
 @_ensure_connection
 def find_atomic_config_document(**kwargs):
     atomic_configs = AtomicConfig.objects(__raw__=kwargs).order_by(
@@ -45,7 +46,6 @@ def build_calculator(calculator, calc_kwargs, calc_exp=None):
             return calc(obs_data=exp_data, **calc_kwargs)
         else:
             return calc(**calc_kwargs)
-
 
 
 @_ensure_connection
@@ -90,8 +90,11 @@ def find_simulation_parameter_document(**kwargs):
 
 
 @_ensure_connection
-def find_simulation_document(**kwargs):
-    sims = Simulation.objects(__raw__=kwargs).order_by(
-        '-_id').all()
+def find_simulation_document(priority=False, **kwargs):
+    if priority:
+        sims = Simulation.objects(__raw__=kwargs).order_by('-priority',
+                                                           '-_id').all()
+    else:
+        sims = Simulation.objects(__raw__=kwargs).order_by('-_id').all()
     for sim in sims:
         yield sim

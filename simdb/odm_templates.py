@@ -66,6 +66,7 @@ class Simulation(DynamicDocument):
     pes = ReferenceField(PES, reverse_delete_rule=DENY, required=True,
                          db_field='PES_id')
     # queue control
+    priority = IntField(default=5)
     ran = BooleanField(default=False)
     skip = BooleanField(default=False)
     error = BooleanField(default=False)
