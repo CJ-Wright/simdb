@@ -60,7 +60,10 @@ class Simulation(DynamicDocument):
     params = ReferenceField(SimulationParameters, reverse_delete_rule=DENY,
                             required=True,
                             db_field='params_id')
-    atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
+    starting_atoms = atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
+                           required=True,
+                           db_field='atoms_id')
+    simulation_atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
                            required=True,
                            db_field='atoms_id')
     pes = ReferenceField(PES, reverse_delete_rule=DENY, required=True,
