@@ -17,6 +17,7 @@ class AtomicConfig(DynamicDocument):
     name = StringField(required=False)
     file_uid = StringField(required=True, unique=True)
     time = FloatField(required=True)
+    generating_comment = StringField()
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
 
@@ -48,7 +49,7 @@ class SimulationParameters(DynamicDocument):
     temperature = FloatField(required=True)
     iterations = IntField(required=True)
     target_acceptance = FloatField(required=True)
-    continue_sim = BooleanField(default=True)
+    # continue_sim = BooleanField(default=True)
 
     time = FloatField(required=True)
     meta = {'indexes': ['temperature'], 'db_alias': DATABASE_ALIAS}
@@ -64,7 +65,6 @@ class Simulation(DynamicDocument):
                            required=True,
                            db_field='atoms_id')
     simulation_atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
-                           required=True,
                            db_field='atoms_id')
     pes = ReferenceField(PES, reverse_delete_rule=DENY, required=True,
                          db_field='PES_id')
@@ -76,18 +76,20 @@ class Simulation(DynamicDocument):
     solved = BooleanField(default=False)
 
     # Simulation returns
-    start_total_energy = FloatField()
-    start_potential_energy = FloatField()
-    start_kinetic_energy = FloatField()
+    start_total_energy = ListField(default=[])
+    start_potential_energy = ListField(default=[])
+    start_kinetic_energy = ListField(default=[])
 
-    final_total_energy = FloatField()
-    final_potential_energy = FloatField()
-    final_kinetic_energy = FloatField()
+    final_total_energy = ListField(default=[])
+    final_potential_energy = ListField(default=[])
+    final_kinetic_energy = ListField(default=[])
 
-    start_time = FloatField()
-    end_time = FloatField()
+    start_time = ListField(default=[])
+    end_time = ListField(default=[])
 
     # Simulation metadata results
-    total_samples = IntField(default=0)
-    leapfrog_per_iter = FloatField(default=0)
+    iterations = ListField(default=[])
+    total_samples = ListField(default=[])
+    total_iterations = ListField(default=[])
+    leapfrog_per_iter = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
