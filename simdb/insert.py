@@ -9,7 +9,7 @@ from filestore import commands as fsc
 from simdb.readers.pdfgetx3_gr import load_gr_file
 from pyiid.wrappers.elasticscatter import ElasticScatter as Scatter
 import numpy as np
-from .search import find_atomic_config_document
+from .search import *
 
 __author__ = 'christopher'
 
@@ -99,44 +99,74 @@ def insert_pdf_data_document(name, input_filename=None,
 
 @_ensure_connection
 def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
-    if time is None:
-        time = ttime.time()
-    if calc_exp is not None:
-        calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
-                    calc_exp=calc_exp, time=time)
-    else:
-        calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
-                    time=time)
-    # save the document
-    calc.save(validate=True, write_concern={"w": 1})
-    return calc
+    try:
+        if calc_exp is None:
+            existing_calc = next(
+                find_calc_document(name=name, calculator=calculator,
+                                   calc_kwargs=calc_kwargs))
+        else:
+            existing_calc = next(
+                find_calc_document(name=name, calculator=calculator,
+                                   calc_kwargs=calc_kwargs, calc_exp=calc_exp))
+
+        print 'Record already exists with id {}'.format(existing_calc.id)
+        print 'Returning the existing calculator'
+        return existing_calc
+
+    except:
+        if time is None:
+            time = ttime.time()
+        if calc_exp is not None:
+            calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
+                        calc_exp=calc_exp, time=time)
+        else:
+            calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
+                        time=time)
+        # save the document
+        calc.save(validate=True, write_concern={"w": 1})
+        return calc
 
 
 @_ensure_connection
 def insert_pes(name, calc_list, time=None):
-    if time is None:
-        time = ttime.time()
-    pes = PES(name=name, calc_list=calc_list,
-              time=time)
-    # save the document
-    pes.save(validate=True, write_concern={"w": 1})
-    return pes
+    try:
+        existing_pes = next(find_pes_document(name=name, calc_list=calc_list))
+        print 'Record already exists with id {}'.format(existing_pes.id)
+        print 'Returning the existing calculator'
+        return existing_pes
+    except:
+        if time is None:
+            time = ttime.time()
+        pes = PES(name=name, calc_list=calc_list,
+                  time=time)
+        # save the document
+        pes.save(validate=True, write_concern={"w": 1})
+        return pes
 
 
 @_ensure_connection
 def insert_simulation_parameters(name, temperature, iterations,
                                  target_acceptance=.65, continue_sim=True,
                                  time=None):
-    if time is None:
-        time = ttime.time()
-    sp = SimulationParameters(name=name, temperature=temperature,
+    try:
+        existing_params = next(
+            find_pes_document(name=name, temperature=temperature,
                               iterations=iterations,
                               target_acceptance=target_acceptance,
-                              continue_sim=continue_sim,
-                              time=time)
-    # save the document
-    sp.save(validate=True, write_concern={"w": 1})
-    return sp
+                              ))
+        print 'Record already exists with id {}'.format(existing_params.id)
+        print 'Returning the existing calculator'
+        return existing_params
+    except:
+        if time is None:
+            time = ttime.time()
+        sp = SimulationParameters(name=name, temperature=temperature,
+                                  iterations=iterations,
+                                  target_acceptance=target_acceptance,
+                                  time=time)
+        # save the document
+        sp.save(validate=True, write_concern={"w": 1})
+        return sp
 
 
 @_ensure_connection
