@@ -25,7 +25,7 @@ start_config = next(find_atomic_config_document(name='Au Oh Starting'))
 target_config = next(find_atomic_config_document(name='Au amorph Target'))
 
 # pdf = insert_pdf_data_document('Au amorph Target', atomic_config=target_config)
-pdf = next(find_pdf_data_document(name='Au amorph Target'))
+pdf = next(find_1d_data_document(name='Au amorph Target'))
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

@@ -57,14 +57,14 @@ def test_pdfcalc_generated():
 
     exp_dict = {'qmin': 0.0, 'qmax': 25., 'qbin': .1, 'rmin': 2.6, 'rmax': 5.,
         'rstep': .01}
-    pdf_db = insert_pdf_data_document('au2 test', atomic_config=db_atoms,
+    pdf_db = insert_experimental_1d_data_document('au2 test', atomic_config=db_atoms,
                                       exp_dict=exp_dict)
 
     calc_kwargs = {'conv': 300, 'potential': 'rw', 'exp_dict': exp_dict}
     a = insert_calc('test spring', 'PDF', calc_kwargs, calc_exp=pdf_db)
     ret, = find_calc_document(_id=a.id)
 
-    pdfdata, = find_pdf_data_document(_id=pdf_db.id)
+    pdfdata, = find_1d_data_document(_id=pdf_db.id)
     pdf = pdfdata.file_payload
 
     local_calc = PDFCalc(obs_data=pdf, **calc_kwargs)
@@ -95,7 +95,7 @@ def test_pdfcalc_cut():
 
     exp_dict = {'qmin': 0.0, 'qmax': 25., 'qbin': .1, 'rmin': 0., 'rmax': 40.,
         'rstep': .01}
-    pdf_db = insert_pdf_data_document('au2 test', atomic_config=db_atoms,
+    pdf_db = insert_experimental_1d_data_document('au2 test', atomic_config=db_atoms,
                                       exp_dict=exp_dict)
     # Here we hem in the bad data
     exp_dict['rmin'] = 3.
@@ -107,7 +107,7 @@ def test_pdfcalc_cut():
     a = insert_calc('test spring', 'PDF', calc_kwargs, calc_exp=pdf_db)
     ret, = find_calc_document(_id=a.id)
 
-    pdfdata, = find_pdf_data_document(_id=pdf_db.id)
+    pdfdata, = find_1d_data_document(_id=pdf_db.id)
     pdf = pdfdata.file_payload
 
     local_calc = PDFCalc(obs_data=pdf, **calc_kwargs)

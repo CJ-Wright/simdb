@@ -16,7 +16,7 @@ parent_atoms = target_config.file_payload[-1]
 
 # Now load the G(r) data, this is not needed if it is already in the DB
 # pdf = insert_pdf_data_document('C60 DFT Target', atomic_config=target_config)
-pdf = next(find_pdf_data_document(name='C60 DFT Target'))
+pdf = next(find_1d_data_document(name='C60 DFT Target'))
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

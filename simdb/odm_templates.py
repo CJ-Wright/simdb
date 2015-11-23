@@ -9,7 +9,8 @@ from mongoengine import (StringField, DictField, IntField, FloatField,
 
 DATABASE_ALIAS = 'simdb'
 
-__all__ = ['PDFData', 'AtomicConfig', 'SimulationParameters', 'Calc', 'PES',
+__all__ = ['ProcessedData', 'AtomicConfig', 'SimulationParameters', 'Calc',
+           'PES',
            'Simulation']
 
 
@@ -21,7 +22,7 @@ class AtomicConfig(DynamicDocument):
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
 
-class PDFData(DynamicDocument):
+class ProcessedData(DynamicDocument):
     name = StringField(required=True)
     file_uid = StringField(required=True)
     experiment_uid = StringField()
@@ -35,7 +36,7 @@ class Calc(DynamicDocument):
     name = StringField(required=True)
     calculator = StringField(required=True)
     calc_kwargs = DictField(required=True)
-    calc_exp = ReferenceField(PDFData)
+    target_data = ReferenceField(ProcessedData)
     meta = {'db_alias': DATABASE_ALIAS}
 
 
@@ -45,29 +46,17 @@ class PES(DynamicDocument):
     meta = {'db_alias': DATABASE_ALIAS}
 
 
-class SimulationParameters(DynamicDocument):
-    temperature = FloatField(required=True)
-    iterations = IntField(required=True)
-    target_acceptance = FloatField(required=True)
-    # continue_sim = BooleanField(default=True)
-
-    time = FloatField(required=True)
-    meta = {'indexes': ['temperature'], 'db_alias': DATABASE_ALIAS}
-
-
 class Simulation(DynamicDocument):
     # Simulation Request Part, all the inputs for a simulation
     name = StringField(required=True)
-    params = ReferenceField(SimulationParameters, reverse_delete_rule=DENY,
-                            required=True,
-                            db_field='params_id')
-    starting_atoms = atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
-                           required=True,
-                           db_field='atoms_id')
-    simulation_atoms = ReferenceField(AtomicConfig, reverse_delete_rule=DENY,
-                           db_field='atoms_id')
+    starting_atoms = ReferenceField(AtomicConfig,
+                                            reverse_delete_rule=DENY,
+                                            required=True,
+                                            db_field='atoms_id')
     pes = ReferenceField(PES, reverse_delete_rule=DENY, required=True,
                          db_field='PES_id')
+    ensemble = ReferenceField(Ensemble, reverse_delete_rule=DENY,
+                              required=True, db_field='ensemble_id')
     # queue control
     priority = IntField(default=5)
     ran = BooleanField(default=False)
@@ -93,4 +82,11 @@ class Simulation(DynamicDocument):
     total_iterations = ListField(default=[])
     leapfrog_per_iter = ListField(default=[])
     seed = ListField(default=[])
+    meta = {'db_alias': DATABASE_ALIAS}
+
+
+class Ensemble(DynamicDocument):
+    name = StringField(required=True)
+    ensemble = StringField(required=True)
+    ensemble_kwargs = DictField(required=True)
     meta = {'db_alias': DATABASE_ALIAS}

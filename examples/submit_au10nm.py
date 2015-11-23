@@ -21,7 +21,7 @@ start_config = insert_atom_document('10nm_Au', starting_atoms)
 
 # Now load the G(r) data, this is not needed if it is already in the DB
 gr_file_loc = '/mnt/work-data/dev/IID_data/examples/Au/10_nm/Au_10nm_d204-00002_00009_sum.gr'
-pdf = insert_pdf_data_document('10nm Au PDF data', input_filename=gr_file_loc)
+pdf = insert_experimental_1d_data_document('10nm Au PDF data', input_filename=gr_file_loc)
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

@@ -33,7 +33,7 @@ target_config = insert_atom_document(name + ' Target',
                                      target_atoms)
 
 # Now load the G(r) data, this is not needed if it is already in the DB
-pdf = insert_pdf_data_document(name + ' Target',
+pdf = insert_experimental_1d_data_document(name + ' Target',
                                atomic_config=target_config,
                                exp_dict={'rmin': 2.3, 'rmax': 13., 'qmin': .1,
                                          'qmax': 50., 'sampling': 'ns'})

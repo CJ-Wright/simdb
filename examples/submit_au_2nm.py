@@ -20,7 +20,7 @@ start_config = insert_atom_document('2nm Au FF+PDF refined', starting_atoms)
 
 # Now load the G(r) data, this is not needed if it is already in the DB
 gr_file_loc = '/mnt/work-data/dev/IID_data/examples/Au/2_nm/10_112_15_Au_Fit2d_FinalSum.gr'
-pdf = insert_pdf_data_document('2nm Au data', input_filename=gr_file_loc)
+pdf = insert_experimental_1d_data_document('2nm Au data', input_filename=gr_file_loc)
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

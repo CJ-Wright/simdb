@@ -22,7 +22,7 @@ start_config = insert_atom_document(name + 'starting config', starting_atoms)
 
 # Now load the G(r) data, this is not needed if it is already in the DB
 gr_file_loc = '/mnt/work-data/dev/IID_data/examples/SnOx/SnO2_300K-sum_00608_637_sqmsklargemsk.gr'
-pdf = insert_pdf_data_document(name + ' PDF Target', input_filename=gr_file_loc)
+pdf = insert_experimental_1d_data_document(name + ' PDF Target', input_filename=gr_file_loc)
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

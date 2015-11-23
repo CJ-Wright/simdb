@@ -13,7 +13,7 @@ parent_atoms = ase.io.read(
 )
 
 target_config = insert_atom_document('Au DFT Target', parent_atoms)
-pdf = insert_pdf_data_document('Au DFT Target', atomic_config=target_config)
+pdf = insert_experimental_1d_data_document('Au DFT Target', atomic_config=target_config)
 
 # Cut the rmin and rmax data
 exp_dict = pdf.pdf_params

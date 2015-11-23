@@ -15,7 +15,7 @@ target_config, = find_atomic_config_document(name='Au102MBA44_Auonly DFT')
 parent_atoms = target_config.file_payload[-1]
 
 # Now load the G(r) data, this is not needed if it is already in the DB
-pdf = insert_pdf_data_document('Au102MBA44_Auonly DFT Target rmax ns',
+pdf = insert_experimental_1d_data_document('Au102MBA44_Auonly DFT Target rmax ns',
                                atomic_config=target_config,
                                exp_dict={'rmin': 2.7, 'rmax': 15., 'qmin': .1,
                                          'qmax': 50., 'sampling': 'ns'})

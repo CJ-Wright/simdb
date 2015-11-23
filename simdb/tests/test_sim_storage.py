@@ -63,7 +63,7 @@ def test_pdf_spring_sim():
         'rmax': 5.,
         'rstep': .01
     }
-    pdf_db = insert_pdf_data_document('au2 test', atomic_config=db_atoms,
+    pdf_db = insert_experimental_1d_data_document('au2 test', atomic_config=db_atoms,
                                       exp_dict=exp_dict)
     calc_kwargs1 = {'conv': 300, 'potential': 'rw', 'exp_dict': exp_dict}
     calc_kwargs2 = {'k': 500, 'rt': 2.0}
@@ -111,7 +111,7 @@ def final_test():
 
     # Now load the G(r) data, this is not needed if it is already in the DB
     gr_file_loc = '/mnt/work-data/dev/IID_data/examples/Au/2_nm/10_112_15_Au_Fit2d_FinalSum.gr'
-    pdf = insert_pdf_data_document('2nm Au data', input_filename=gr_file_loc)
+    pdf = insert_experimental_1d_data_document('2nm Au data', input_filename=gr_file_loc)
 
     # Cut the rmin and rmax data
     exp_dict = pdf.pdf_params

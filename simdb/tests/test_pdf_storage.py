@@ -28,9 +28,9 @@ def test_insert_and_retrieve_fabricated_data():
     a = insert_atom_document('au2', atoms)
     ret, = find_atomic_config_document(_id=a.id)
 
-    pdf = insert_pdf_data_document('test au2', atomic_config=ret)
+    pdf = insert_experimental_1d_data_document('test au2', atomic_config=ret)
 
-    ret_pdf, = find_pdf_data_document(_id=pdf.id)
+    ret_pdf, = find_1d_data_document(_id=pdf.id)
     s = Scatter()
     actual_gr = s.get_pdf(ret.file_payload[0])
     # make sure the retrieved document got something from filestore
@@ -43,9 +43,9 @@ def test_insert_and_retrieve_fabricated_data():
 
 def test_insert_and_retrieve_actual_data():
     file_loc = 'simdb/tests/FinalSum_Ni_STD.gr'
-    pdf = insert_pdf_data_document('test actual', input_filename=file_loc)
+    pdf = insert_experimental_1d_data_document('test actual', input_filename=file_loc)
 
-    ret_pdf, = find_pdf_data_document(_id=pdf.id)
+    ret_pdf, = find_1d_data_document(_id=pdf.id)
 
     actual_gr = load_gr_file(file_loc)[1]
     # make sure the retrieved document got something from filestore

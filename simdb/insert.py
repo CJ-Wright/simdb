@@ -14,7 +14,6 @@ from .search import *
 __author__ = 'christopher'
 
 
-
 @_ensure_connection
 def insert_atom_document(name, ase_object, time=None):
     if time is None:
@@ -44,8 +43,34 @@ def insert_atom_document(name, ase_object, time=None):
 
 
 @_ensure_connection
-def insert_pdf_data_document(name, input_filename=None,
-                             atomic_config=None, exp_dict=None, time=None):
+def insert_experimental_1d_data_document(name, input_filename=None,
+                                         parameter_function=None,
+                                         time=None):
+    if time is None:
+        time = ttime.time()
+    # at some level, you dont actually care where this thing is on disk
+    file_uid = str(uuid4())
+
+    # Then the data is experimental, thus we should let filestore know it
+    # exists, and load the PDF generating parameters into the Metadata
+    res = fsc.insert_resource('pdfgetx3', input_filename)
+    fsc.insert_datum(res, file_uid)
+    params = parameter_function(input_filename)
+
+    # create an instance of a mongo document (metadata)
+    a = ProcessedData(name=name, file_uid=file_uid,
+                      # experiment_uid=exp_uid,
+                      pdf_params=params, time=time)
+    # save the document
+    a.save()
+    return a
+
+
+@_ensure_connection
+def insert_generated_1d_data_document(name,
+                                      atomic_config=None, exp_func=None,
+                                      exp_params=None,
+                                      time=None):
     if time is None:
         time = ttime.time()
     # at some level, you dont actually care where this thing is on disk
@@ -53,46 +78,27 @@ def insert_pdf_data_document(name, input_filename=None,
     # create the filename
     file_name = os.path.join(simdb.PDF_PATH, file_uid + '.gr')
 
-    generated = False
-    if atomic_config is not None:
-        # Then we should generate the PDF
-        s = Scatter(exp_dict)
+    # get the atomic configuration from the DB
+    atomic_doc, = find_atomic_config_document(_id=atomic_config.id)
+    atoms = atomic_doc.file_payload[-1]
 
-        # Just in case we use the exp_dict = None default params
-        params = s.exp
+    # Generate the PDF from the atomic configuration
+    gobs = exp_func(atoms)
+    generated = True
 
-        # get the atomic configuration from the DB
-        atomic_doc, = find_atomic_config_document(_id=atomic_config.id)
-        atoms = atomic_doc.file_payload[-1]
-
-        # Generate the PDF from the atomic configuration
-        gobs = s.get_pdf(atoms)
-        generated = True
-
-        # Save the gobs
-        # TODO: replace with context
-        f = open(file_name, 'w')
-        np.save(f, gobs)
-        f.close()
-        res = fsc.insert_resource('genpdf', file_name)
-        fsc.insert_datum(res, file_uid)
-    else:
-        # Then the pdf is experimental, thus we should let filestore know it
-        # exists, and load the PDF generating parameters into the Metadata
-        res = fsc.insert_resource('pdfgetx3', input_filename)
-        fsc.insert_datum(res, file_uid)
-        params = load_gr_file(input_filename)[-1]
+    # Save the gobs
+    # TODO: replace with context
+    f = open(file_name, 'w')
+    np.save(f, gobs)
+    f.close()
+    res = fsc.insert_resource('genpdf', file_name)
+    fsc.insert_datum(res, file_uid)
 
     # create an instance of a mongo document (metadata)
     if generated is True:
-        a = PDFData(name=name, file_uid=file_uid, ase_config_id=atomic_config,
-                    pdf_params=params, time=time)
-    else:
-        a = PDFData(name=name, file_uid=file_uid,
-                    # will support when we merge this with metadata store
-                    # experiment_uid=exp_uid,
-                    pdf_params=params, time=time)
-    # save the document
+        a = ProcessedData(name=name, file_uid=file_uid,
+                          ase_config_id=atomic_config,
+                          pdf_params=exp_params, time=time)
     a.save()
     return a
 
@@ -117,10 +123,12 @@ def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
         if time is None:
             time = ttime.time()
         if calc_exp is not None:
-            calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
+            calc = Calc(name=name, calculator=calculator,
+                        calc_kwargs=calc_kwargs,
                         calc_exp=calc_exp, time=time)
         else:
-            calc = Calc(name=name, calculator=calculator, calc_kwargs=calc_kwargs,
+            calc = Calc(name=name, calculator=calculator,
+                        calc_kwargs=calc_kwargs,
                         time=time)
         # save the document
         calc.save(validate=True, write_concern={"w": 1})
@@ -145,35 +153,17 @@ def insert_pes(name, calc_list, time=None):
 
 
 @_ensure_connection
-def insert_simulation_parameters(name, temperature, iterations,
-                                 target_acceptance=.65, continue_sim=True,
-                                 time=None):
-    try:
-        existing_params = next(
-            find_pes_document(name=name, temperature=temperature,
-                              iterations=iterations,
-                              target_acceptance=target_acceptance,
-                              ))
-        print 'Record already exists with id {}'.format(existing_params.id)
-        print 'Returning the existing calculator'
-        return existing_params
-    except:
-        if time is None:
-            time = ttime.time()
-        sp = SimulationParameters(name=name, temperature=temperature,
-                                  iterations=iterations,
-                                  target_acceptance=target_acceptance,
-                                  time=time)
-        # save the document
-        sp.save(validate=True, write_concern={"w": 1})
-        return sp
-
-
-@_ensure_connection
-def insert_simulation(name, params, atoms, pes, skip=False, time=None):
+def insert_simulation(name, starting_atoms, pes, ensemble, skip=False,
+                      iterations=None,
+                      time=None):
     if time is None:
         time = ttime.time()
-    sp = Simulation(name=name, params=params, atoms=atoms, pes=pes, skip=skip)
+    if iterations is None:
+        iteration = []
+    else:
+        iteration = [iterations]
+    sp = Simulation(name=name, starting_atoms=starting_atoms,
+                    ensemble=ensemble, pes=pes, iterations=iteration, skip=skip)
     # save the document
     sp.save(validate=True, write_concern={"w": 1})
     return sp
