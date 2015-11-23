@@ -26,21 +26,25 @@ def find_1d_data_document(**kwargs):
         yield data_set
 
 
-supported_ensembles = {
+supported_calculators = {
     '1D': ['pyiid.calc.calc_1d', 'Calc1D', find_1d_data_document],
     'Spring': ['pyiid.calc.spring_calc', 'Spring'],
     'LAMMPS': ['ase.calculators.lammpslib', 'LAMMPSlib']
 }
 
+supported_ensembles = {
+    'NUTS': ['pyiid.sim.nuts_hmc', 'Calc1D'],
+}
+
 
 def build_calculator(calculator, calc_kwargs, target_data=None):
-    if calculator in supported_ensembles.keys():
+    if calculator in supported_calculators.keys():
         # If experimental PES put in the exp, also modify the calcs themselves
         # they may need to write their own scatter object
-        mod = importlib.import_module(supported_ensembles[calculator][0])
-        calc = getattr(mod, supported_ensembles[calculator][1])
+        mod = importlib.import_module(supported_calculators[calculator][0])
+        calc = getattr(mod, supported_calculators[calculator][1])
         if target_data is not None:
-            exp, = supported_ensembles[calculator][2](_id=target_data.id)
+            exp, = supported_calculators[calculator][2](_id=target_data.id)
             exp_data = exp.file_payload
             return calc(target_data=exp_data, **calc_kwargs)
         else:

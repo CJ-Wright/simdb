@@ -82,6 +82,7 @@ class Simulation(DynamicDocument):
     total_iterations = ListField(default=[])
     leapfrog_per_iter = ListField(default=[])
     seed = ListField(default=[])
+    metadata = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
 
 
