@@ -45,6 +45,7 @@ def insert_atom_document(name, ase_object, time=None):
 @_ensure_connection
 def insert_experimental_1d_data_document(name, input_filename=None,
                                          parameter_function=None,
+                                         filestore_handle='pdfgetx3',
                                          time=None):
     if time is None:
         time = ttime.time()
@@ -53,7 +54,7 @@ def insert_experimental_1d_data_document(name, input_filename=None,
 
     # Then the data is experimental, thus we should let filestore know it
     # exists, and load the PDF generating parameters into the Metadata
-    res = fsc.insert_resource('pdfgetx3', input_filename)
+    res = fsc.insert_resource(filestore_handle, input_filename)
     fsc.insert_datum(res, file_uid)
     params = parameter_function(input_filename)
 
