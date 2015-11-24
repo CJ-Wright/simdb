@@ -1,6 +1,6 @@
 import simdb
-from simdb.odm_templates import AtomicConfig, SimulationParameters
-from simdb.insert import insert_atom_document, insert_simulation_parameters
+from simdb.odm_templates import AtomicConfig
+from simdb.insert import insert_atom_document
 from simdb.search import find_atomic_config_document
 import time as ttime
 import tempfile

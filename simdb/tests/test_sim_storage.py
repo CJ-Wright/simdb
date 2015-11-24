@@ -1,8 +1,7 @@
-__author__ = 'christopher'
 import simdb
 from uuid import uuid4
 import simdb
-from simdb.odm_templates import AtomicConfig, SimulationParameters
+from simdb.odm_templates import AtomicConfig
 from simdb.insert import *
 from simdb.search import *
 import time as ttime
@@ -10,6 +9,7 @@ import tempfile
 import ase
 from simdb.utils.testing import simdb_setup, simdb_teardown
 from nose.tools import assert_equal, assert_not_equal
+__author__ = 'christopher'
 
 def setup():
     simdb_setup()
