@@ -23,7 +23,7 @@ install:
   - conda update conda --yes
   - conda create -n testenv --yes pip nose python=$TRAVIS_PYTHON_VERSION pymongo=2.8 six pyyaml numpy h5py pims jsonschema
   - conda install -n testenv --yes -c soft-matter tifffile
-  - conda install -n testenv --yes -c numpy
+  - conda install -n testenv --yes numpy
   - source activate testenv
   - pip install coveralls mongoengine boltons python-ase
   - 'pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore'
