@@ -27,7 +27,7 @@ class ProcessedData(DynamicDocument):
     file_uid = StringField(required=True)
     experiment_uid = StringField()
     ase_config_id = ReferenceField(AtomicConfig)
-    pdf_params = DictField(required=True)
+    exp_params = DictField(required=True)
     time = FloatField(required=True)
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
@@ -43,6 +43,13 @@ class Calc(DynamicDocument):
 class PES(DynamicDocument):
     name = StringField(required=True)
     calc_list = ListField(required=True)
+    meta = {'db_alias': DATABASE_ALIAS}
+
+
+class Ensemble(DynamicDocument):
+    name = StringField(required=True)
+    ensemble = StringField(required=True)
+    ensemble_kwargs = DictField(required=True)
     meta = {'db_alias': DATABASE_ALIAS}
 
 
@@ -86,8 +93,3 @@ class Simulation(DynamicDocument):
     meta = {'db_alias': DATABASE_ALIAS}
 
 
-class Ensemble(DynamicDocument):
-    name = StringField(required=True)
-    ensemble = StringField(required=True)
-    ensemble_kwargs = DictField(required=True)
-    meta = {'db_alias': DATABASE_ALIAS}

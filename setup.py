@@ -67,7 +67,7 @@ else:
 setup(
     name='simdb',
     version=FULLVERSION,
-    author='Arkilic',
+    author='Wright',
     author_email=None,
     license="BSD (3-clause)",
     packages=['simdb'],

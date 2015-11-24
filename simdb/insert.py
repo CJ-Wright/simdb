@@ -6,8 +6,7 @@ from ase import io as aseio
 from .utils import _ensure_connection
 from .odm_templates import *
 from filestore import commands as fsc
-from simdb.readers.pdfgetx3_gr import load_gr_file
-from pyiid.wrappers.elasticscatter import ElasticScatter as Scatter
+from .readers.pdfgetx3_gr import load_gr_file
 import numpy as np
 from .search import *
 
@@ -61,7 +60,7 @@ def insert_experimental_1d_data_document(name, input_filename=None,
     # create an instance of a mongo document (metadata)
     a = ProcessedData(name=name, file_uid=file_uid,
                       # experiment_uid=exp_uid,
-                      pdf_params=params, time=time)
+                      exp_params=params, time=time)
     # save the document
     a.save()
     return a
@@ -71,6 +70,7 @@ def insert_experimental_1d_data_document(name, input_filename=None,
 def insert_generated_1d_data_document(name,
                                       atomic_config=None, exp_func=None,
                                       exp_params=None,
+                                      handler='genpdf',
                                       time=None):
     if time is None:
         time = ttime.time()
@@ -84,22 +84,22 @@ def insert_generated_1d_data_document(name,
     atoms = atomic_doc.file_payload[-1]
 
     # Generate the PDF from the atomic configuration
-    gobs = exp_func(atoms)
+    data = exp_func(atoms)
     generated = True
 
     # Save the gobs
     # TODO: replace with context
     f = open(file_name, 'w')
-    np.save(f, gobs)
+    np.save(f, data)
     f.close()
-    res = fsc.insert_resource('genpdf', file_name)
+    res = fsc.insert_resource(handler, file_name)
     fsc.insert_datum(res, file_uid)
 
     # create an instance of a mongo document (metadata)
     if generated is True:
         a = ProcessedData(name=name, file_uid=file_uid,
                           ase_config_id=atomic_config,
-                          pdf_params=exp_params, time=time)
+                          exp_params=exp_params, time=time)
     a.save()
     return a
 
@@ -155,7 +155,7 @@ def insert_pes(name, calc_list, time=None):
 
 @_ensure_connection
 def insert_simulation(name, starting_atoms, pes, ensemble, skip=False,
-                      iterations=None,
+                      iterations=100,
                       time=None):
     if time is None:
         time = ttime.time()
