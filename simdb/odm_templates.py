@@ -2,15 +2,13 @@
 ODM templates for use with metadatstore
 """
 import os
-
 from mongoengine import DynamicDocument
 from mongoengine import (StringField, DictField, IntField, FloatField,
                          ReferenceField, BooleanField, ListField, DENY)
 
 DATABASE_ALIAS = 'simdb'
 
-__all__ = ['ProcessedData', 'AtomicConfig', 'SimulationParameters', 'Calc',
-           'PES',
+__all__ = ['ProcessedData', 'AtomicConfig', 'Ensemble', 'Calc', 'PES',
            'Simulation']
 
 
@@ -57,9 +55,9 @@ class Simulation(DynamicDocument):
     # Simulation Request Part, all the inputs for a simulation
     name = StringField(required=True)
     starting_atoms = ReferenceField(AtomicConfig,
-                                            reverse_delete_rule=DENY,
-                                            required=True,
-                                            db_field='atoms_id')
+                                    reverse_delete_rule=DENY,
+                                    required=True,
+                                    db_field='atoms_id')
     pes = ReferenceField(PES, reverse_delete_rule=DENY, required=True,
                          db_field='PES_id')
     ensemble = ReferenceField(Ensemble, reverse_delete_rule=DENY,
@@ -91,5 +89,3 @@ class Simulation(DynamicDocument):
     seed = ListField(default=[])
     metadata = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
-
-
