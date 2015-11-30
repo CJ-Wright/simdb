@@ -77,7 +77,7 @@ def find_pes_document(**kwargs):
             calc = build_calculator(
                 calculator=calc_params.calculator,
                 calc_kwargs=calc_params.calc_kwargs,
-                target_data=calc_params.calc_exp
+                target_data=calc_params.target_data
             )
             calc_l.append(calc)
         pes.payload = MultiCalc(calc_list=calc_l)
