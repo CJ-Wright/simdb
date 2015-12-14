@@ -43,23 +43,25 @@ def insert_atom_document(name, ase_object, time=None):
 
 @_ensure_connection
 def insert_experimental_1d_data_document(name, input_filename=None,
-                                         parameter_function=None,
-                                         filestore_handle='pdfgetx3',
+                                         handler='pdfgetx3',
                                          time=None):
     if time is None:
         time = ttime.time()
     # at some level, you dont actually care where this thing is on disk
     file_uid = str(uuid4())
+    if handler == 'pdfgetx3':
+        data_type = 'PDF'
+    else:
+        raise NotImplementedError
 
     # Then the data is experimental, thus we should let filestore know it
     # exists, and load the PDF generating parameters into the Metadata
-    res = fsc.insert_resource(filestore_handle, input_filename)
+    res = fsc.insert_resource(handler, input_filename)
     fsc.insert_datum(res, file_uid)
-    params = parameter_function(input_filename)
+    x, y, params = fsc.retrieve(file_uid)
 
     # create an instance of a mongo document (metadata)
-    a = ProcessedData(name=name, file_uid=file_uid,
-                      # experiment_uid=exp_uid,
+    a = ProcessedData(name=name, file_uid=file_uid, data_type=data_type,
                       exp_params=params, time=time)
     # save the document
     a.save()
@@ -76,6 +78,13 @@ def insert_generated_1d_data_document(name,
         time = ttime.time()
     # at some level, you dont actually care where this thing is on disk
     file_uid = str(uuid4())
+    if handler == 'genpdf':
+        data_type = 'PDF'
+    elif handler == 'genfq':
+        data_type = 'FQ'
+    else:
+        raise NotImplementedError
+
     # create the filename
     file_name = os.path.join(simdb.PDF_PATH, file_uid + '.gr')
 
@@ -89,32 +98,31 @@ def insert_generated_1d_data_document(name,
 
     # Save the gobs
     # TODO: replace with context
-    f = open(file_name, 'w')
-    np.save(f, data)
-    f.close()
+    with open(file_name, 'w') as f:
+        np.save(f, data)
     res = fsc.insert_resource(handler, file_name)
     fsc.insert_datum(res, file_uid)
 
     # create an instance of a mongo document (metadata)
-    if generated is True:
-        a = ProcessedData(name=name, file_uid=file_uid,
-                          ase_config_id=atomic_config,
-                          exp_params=exp_params, time=time)
+    a = ProcessedData(name=name, file_uid=file_uid, data_type=data_type,
+                      ase_config_id=atomic_config,
+                      exp_params=exp_params, time=time)
     a.save()
     return a
 
 
 @_ensure_connection
-def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
+def insert_calc(name, calculator, calc_kwargs, target_data=None, time=None):
     try:
-        if calc_exp is None:
+        if target_data is None:
             existing_calc = next(
                 find_calc_document(name=name, calculator=calculator,
                                    calc_kwargs=calc_kwargs))
         else:
             existing_calc = next(
                 find_calc_document(name=name, calculator=calculator,
-                                   calc_kwargs=calc_kwargs, calc_exp=calc_exp))
+                                   calc_kwargs=calc_kwargs,
+                                   calc_exp=target_data))
 
         print 'Record already exists with id {}'.format(existing_calc.id)
         print 'Returning the existing calculator'
@@ -123,10 +131,10 @@ def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
     except:
         if time is None:
             time = ttime.time()
-        if calc_exp is not None:
+        if target_data is not None:
             calc = Calc(name=name, calculator=calculator,
                         calc_kwargs=calc_kwargs,
-                        calc_exp=calc_exp, time=time)
+                        target_data=target_data, time=time)
         else:
             calc = Calc(name=name, calculator=calculator,
                         calc_kwargs=calc_kwargs,
@@ -164,7 +172,28 @@ def insert_simulation(name, starting_atoms, pes, ensemble, skip=False,
     else:
         iteration = [iterations]
     sp = Simulation(name=name, starting_atoms=starting_atoms,
-                    ensemble=ensemble, pes=pes, iterations=iteration, skip=skip)
+                    ensemble=ensemble, pes=pes, iterations=iteration,
+                    skip=skip)
     # save the document
     sp.save(validate=True, write_concern={"w": 1})
     return sp
+
+
+@_ensure_connection
+def insert_ensemble(name, ensemble_name, ensemble_kwargs, time=None):
+    try:
+        existing_ensemble = next(find_ensemble_document(name=name,
+                                                        ensemble_name=ensemble_name,
+                                                        ensemble_kwargs=ensemble_kwargs))
+        print 'Record already exists with id {}'.format(existing_ensemble.id)
+        print 'Returning the existing calculator'
+        return existing_ensemble
+    except:
+        if time is None:
+            time = ttime.time()
+        ensemble = Ensemble(name=name, ensemble=ensemble_name,
+                            ensemble_kwargs=ensemble_kwargs,
+                            time=time)
+        # save the document
+        ensemble.save(validate=True, write_concern={"w": 1})
+        return ensemble

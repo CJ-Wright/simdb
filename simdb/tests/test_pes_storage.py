@@ -59,3 +59,16 @@ def test_insert_and_retrieve_fabricated_data():
     # make sure that the bits that came back from filestore are a different
     # object
     assert_not_equal(id(local), id(ret.payload))
+
+if __name__ == '__main__':
+    import nose
+
+    nose.runmodule(argv=[
+        # '-s',
+        '--with-doctest',
+        # '--nocapture',
+        '-v',
+        '-x',
+    ],
+        # env={"NOSE_PROCESSES": 1, "NOSE_PROCESS_TIMEOUT": 599},
+        exit=False)

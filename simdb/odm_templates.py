@@ -23,13 +23,16 @@ class AtomicConfig(DynamicDocument):
 class ProcessedData(DynamicDocument):
     name = StringField(required=True)
     file_uid = StringField(required=True)
+    data_type = StringField(required=True)
     experiment_uid = StringField()
     ase_config_id = ReferenceField(AtomicConfig)
     exp_params = DictField(required=True)
     time = FloatField(required=True)
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
-
+# TODO: Need to deal with calculators with function kwargs
+# It seems that BSON can't serialize the functions
+# It may be necessary to build the function/object upon search
 class Calc(DynamicDocument):
     name = StringField(required=True)
     calculator = StringField(required=True)

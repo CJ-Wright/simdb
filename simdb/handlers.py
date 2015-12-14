@@ -31,7 +31,7 @@ class PDFGetX3Handler(HandlerBase):
         self.filename = str(filename)
 
     def __call__(self, **kwargs):
-        return load_gr_file(self.filename, **kwargs)[1]
+        return load_gr_file(self.filename, **kwargs)
 
 
 class GeneratedPDFHandler(HandlerBase):

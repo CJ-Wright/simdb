@@ -33,9 +33,21 @@ supported_calculators = {
 }
 
 supported_ensembles = {
-    'NUTS': ['pyiid.sim.nuts_hmc', 'Calc1D'],
+    'NUTS': ['pyiid.sim.nuts_hmc', 'NUTSCanonicalEnsemble'],
 }
 
+supported_experiments = {'PDF': ['pyiid.experiments.elasticscatter',
+                                 'ElasticScatter', 'get_pdf', 'get_grad_pdf'],
+                         'FQ': ['pyiid.experiments.elasticscatter',
+                                 'ElasticScatter', 'get_fq', 'get_grad_fq']}
+
+def build_experiment(data_type, exp_params):
+    if data_type in supported_experiments.keys():
+        mod = importlib.import_module(supported_experiments[data_type][0])
+        exp = getattr(mod, supported_experiments[data_type][1])(exp_params)
+        func = getattr(exp, supported_experiments[data_type][2])
+        grad = getattr(exp, supported_experiments[data_type][3])
+        return func, grad
 
 def build_calculator(calculator, calc_kwargs, target_data=None):
     if calculator in supported_calculators.keys():
@@ -46,10 +58,20 @@ def build_calculator(calculator, calc_kwargs, target_data=None):
         if target_data is not None:
             exp, = supported_calculators[calculator][2](_id=target_data.id)
             exp_data = exp.file_payload
+            f, g = build_experiment(target_data.data_type, target_data.exp_params)
+            calc_kwargs['exp_function'] = f
+            calc_kwargs['exp_grad_function'] = g
             return calc(target_data=exp_data, **calc_kwargs)
         else:
             return calc(**calc_kwargs)
 
+def build_ensemble(ensemble, ensemble_kwargs, atoms):
+    if ensemble in supported_ensembles.keys():
+        # If experimental PES put in the exp, also modify the calcs themselves
+        # they may need to write their own scatter object
+        mod = importlib.import_module(supported_ensembles[ensemble][0])
+        ens = getattr(mod, supported_ensembles[ensemble][1])
+        return ens(atoms, ensemble_kwargs)
 
 @_ensure_connection
 def find_calc_document(**kwargs):
@@ -85,14 +107,6 @@ def find_pes_document(**kwargs):
 
 
 @_ensure_connection
-def find_simulation_parameter_document(**kwargs):
-    sim_params = SimulationParameters.objects(__raw__=kwargs).order_by(
-        '-_id').all()
-    for params in sim_params:
-        yield params
-
-
-@_ensure_connection
 def find_simulation_document(priority=False, **kwargs):
     if priority:
         sims = Simulation.objects(__raw__=kwargs).order_by('-priority',
@@ -102,14 +116,6 @@ def find_simulation_document(priority=False, **kwargs):
     for sim in sims:
         yield sim
 
-
-def build_ensemble(ensemble, ensemble_kwargs, atoms):
-    if ensemble in supported_ensembles.keys():
-        # If experimental PES put in the exp, also modify the calcs themselves
-        # they may need to write their own scatter object
-        mod = importlib.import_module(supported_ensembles[ensemble][0])
-        ens = getattr(mod, supported_ensembles[ensemble][1])
-        return ens(atoms, ensemble_kwargs)
 
 @_ensure_connection
 def find_ensemble_document(atoms, **kwargs):

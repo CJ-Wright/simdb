@@ -28,12 +28,15 @@ def teardown():
 def test_insert_and_retrieve_fabricated_data():
     atoms = ase.Atoms('Au2', [[0, 0, 0], [0, 0, 3]])
     a = insert_atom_document('au2', atoms)
+    s = ElasticScatter()
     ret, = find_atomic_config_document(_id=a.id)
 
-    pdf = insert_experimental_1d_data_document('test au2', atomic_config=ret)
+    pdf = insert_generated_1d_data_document('test au2',
+                                            atomic_config=ret,
+                                            exp_func=s.get_pdf,
+                                            exp_params=s.exp)
 
     ret_pdf, = find_1d_data_document(_id=pdf.id)
-    s = ElasticScatter()
     actual_gr = s.get_pdf(ret.file_payload[0])
     # make sure the retrieved document got something from filestore
     assert (hasattr(ret_pdf, 'file_payload'))
@@ -47,7 +50,8 @@ def test_insert_and_retrieve_fabricated_data():
 def test_insert_and_retrieve_actual_data():
     file_loc = 'simdb/tests/FinalSum_Ni_STD.gr'
     pdf = insert_experimental_1d_data_document('test actual',
-                                               input_filename=file_loc)
+                                               input_filename=file_loc,
+                                               )
 
     ret_pdf, = find_1d_data_document(_id=pdf.id)
 
@@ -56,7 +60,19 @@ def test_insert_and_retrieve_actual_data():
     assert (hasattr(ret_pdf, 'file_payload'))
     # make sure the payload is equivalent to the original atoms
     print ret_pdf.file_payload
-    assert (np.all(actual_gr == ret_pdf.file_payload))
+    assert (np.all(actual_gr == ret_pdf.file_payload[1]))
     # make sure that the bits that came back from filestore are a different
     # object
     assert_not_equal(id(actual_gr), id(ret_pdf.file_payload))
+
+if __name__ == '__main__':
+    import nose
+    nose.runmodule(argv=[
+        # '-s',
+        '--with-doctest',
+        # '--nocapture',
+        '-v',
+        '-x',
+    ],
+        # env={"NOSE_PROCESSES": 1, "NOSE_PROCESS_TIMEOUT": 599},
+        exit=False)

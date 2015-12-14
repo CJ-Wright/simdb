@@ -47,7 +47,7 @@ exp_dict = pdf.pdf_params
 # Now create the kwargs for the two calculators: PDF and Spring
 calc_kwargs1 = {'conv': 300., 'potential': 'rw', 'exp_dict': exp_dict}
 calc1 = insert_calc(name + ' Rw', 'PDF', calc_kwargs1,
-                    calc_exp=pdf)
+                    target_data=pdf)
 
 calc_kwargs2 = {'k': 200, 'rt': exp_dict['rmin']}
 calc2 = insert_calc(name + ' spring', 'Spring', calc_kwargs2)
