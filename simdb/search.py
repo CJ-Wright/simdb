@@ -85,14 +85,6 @@ def find_pes_document(**kwargs):
 
 
 @_ensure_connection
-def find_simulation_parameter_document(**kwargs):
-    sim_params = SimulationParameters.objects(__raw__=kwargs).order_by(
-        '-_id').all()
-    for params in sim_params:
-        yield params
-
-
-@_ensure_connection
 def find_simulation_document(priority=False, **kwargs):
     if priority:
         sims = Simulation.objects(__raw__=kwargs).order_by('-priority',
