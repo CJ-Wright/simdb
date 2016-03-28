@@ -33,7 +33,7 @@ supported_calculators = {
 }
 
 supported_ensembles = {
-    'NUTS': ['pyiid.sim.nuts_hmc', 'Calc1D'],
+    'NUTS': ['pyiid.sim.nuts_hmc', 'Calc1D'], #FIXME: Needs to be NUTS?
 }
 
 
