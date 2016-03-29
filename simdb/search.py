@@ -1,3 +1,4 @@
+from __future__ import print_function
 from .odm_templates import *
 from filestore.api import *
 from .utils import _ensure_connection, get_git_hash, get_conda_env
@@ -6,16 +7,26 @@ from pyiid.calc.multi_calc import MultiCalc
 import importlib
 from git import Repo
 import os.path
+import numpy as np
 
 __author__ = 'christopher'
 
+
 def set_software_env(config):
     if hasattr(config, 'payload'):
-        config.git_hash.append({'odm':get_git_hash(config), 
-                                'payload':get_git_hash(config.payload)})
+        if isinstance(config.payload, list) and 'numpy' not in [
+            type(p).__module__ for p in config.payload]:
+            config.git_hash.append({'odm': get_git_hash(config),
+                                    'payload': get_git_hash(
+                                        config.payload[0])})
+        elif type(config.payload).__module__ != 'numpy':
+            config.git_hash.append({'odm': get_git_hash(config),
+                                    'payload': get_git_hash(
+                                        config.payload)})
     else:
         config.git_hash.append(get_git_hash(config))
     config.conda_list.append(get_conda_env())
+
 
 @_ensure_connection
 def find_atomic_config_document(**kwargs):

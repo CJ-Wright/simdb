@@ -69,9 +69,10 @@ def test_pdfcalc_generated():
                    }
     a = insert_calc('test spring', '1D', calc_kwargs, target_data=pdf_db)
     ret, = find_calc_document(_id=a.id)
+    print ret.payload
 
     pdfdata, = find_1d_data_document(_id=pdf_db.id)
-    pdf = pdfdata.file_payload
+    pdf = pdfdata.payload
 
     calc_kwargs['exp_function'] = s.get_pdf
     calc_kwargs['exp_grad_function'] = s.get_grad_pdf
@@ -125,7 +126,7 @@ def test_pdfcalc_cut():
     ret, = find_calc_document(_id=a.id)
 
     pdfdata, = find_1d_data_document(_id=pdf_db.id)
-    pdf = pdfdata.file_payload
+    pdf = pdfdata.payload
 
     calc_kwargs['exp_function'] = s.get_pdf
     calc_kwargs['exp_grad_function'] = s.get_grad_pdf

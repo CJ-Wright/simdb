@@ -90,7 +90,7 @@ def insert_generated_1d_data_document(name,
 
     # get the atomic configuration from the DB
     atomic_doc, = find_atomic_config_document(_id=atomic_config.id)
-    atoms = atomic_doc.file_payload[-1]
+    atoms = atomic_doc.payload[-1]
 
     # Generate the PDF from the atomic configuration
     data = exp_func(atoms)

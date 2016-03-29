@@ -4,7 +4,7 @@ from mongoengine import connect
 import mongoengine
 import importlib
 import subprocess
-from git import Repo, InvalidGitRepositoryError
+from git import Repo, InvalidGitRepositoryError, NoSuchPathError
 
 from .. import odm_templates
 
@@ -49,6 +49,6 @@ def get_git_hash(class_or_function):
                 class_or_function.__module__
             ).__file__
         ).head.commit.hexsha
-    except InvalidGitRepositoryError:
+    except(InvalidGitRepositoryError, NoSuchPathError):
         print('Project not under git')
         return

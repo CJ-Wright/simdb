@@ -25,12 +25,12 @@ def test_single_config():
     ret, = find_atomic_config_document(_id=a.id)
 
     # make sure the retrieved document got something from filestore
-    assert(hasattr(ret, 'file_payload'))
+    assert(hasattr(ret, 'payload'))
     # make sure the payload is equivalent to the original atoms
-    assert(atoms == ret.file_payload[0])
+    assert(atoms == ret.payload[0])
     # make sure that the bits that came back from filestore are a different
     # object
-    assert_not_equal(id(atoms), id(ret.file_payload))
+    assert_not_equal(id(atoms), id(ret.payload))
 
 
 def test_traj():
@@ -41,13 +41,13 @@ def test_traj():
     ret, = find_atomic_config_document(_id=a.id)
 
     # make sure the retrieved document got something from filestore
-    assert(hasattr(ret, 'file_payload'))
+    assert(hasattr(ret, 'payload'))
     # make sure the payload is equivalent to the original atoms
-    print ret.file_payload
-    assert(traj == ret.file_payload)
+    print ret.payload
+    assert(traj == ret.payload)
     # make sure that the bits that came back from filestore are a different
     # object
-    assert_not_equal(id(traj), id(ret.file_payload))
+    assert_not_equal(id(traj), id(ret.payload))
 
 if __name__ == '__main__':
     import nose
