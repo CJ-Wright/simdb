@@ -3,6 +3,8 @@ import simdb
 from mongoengine import connect
 import mongoengine
 import importlib
+import subprocess
+from git import Repo, InvalidGitRepositoryError
 
 from .. import odm_templates
 
@@ -33,3 +35,20 @@ def db_connect(database, host, port):
     """Helper function to deal with stateful connections to mongoengine"""
     return connect(db=database, host=host, port=port,
                    alias=odm_templates.DATABASE_ALIAS)
+
+def get_conda_env():
+    return subprocess.check_output(['conda', 'list', '-e']).decode()
+
+def get_git_hash(class_or_function):
+    """
+    Get the module of the class or function, import it and get it's git hash
+    if there is any"""
+    try:
+        return Repo(
+            importlib.import_module(
+                class_or_function.__module__
+            ).__file__
+        ).head.commit.hexsha
+    except InvalidGitRepositoryError:
+        print('Project not under git')
+        return

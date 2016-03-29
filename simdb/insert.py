@@ -5,7 +5,7 @@ import simdb
 from ase import io as aseio
 from .utils import _ensure_connection
 from .odm_templates import *
-from filestore import commands as fsc
+from filestore.api import insert_resource, insert_datum, retrieve
 from .readers.pdfgetx3_gr import load_gr_file
 import numpy as np
 from .search import *
@@ -30,8 +30,8 @@ def insert_atom_document(name, ase_object, time=None):
     aseio.write(file_name, ase_object)
 
     # do the filestore magic
-    resource = fsc.insert_resource('ase', file_name)
-    fsc.insert_datum(resource, file_uid,
+    resource = insert_resource('ase', file_name)
+    insert_datum(resource, file_uid,
                      datum_kwargs={'is_trajectory': is_trajectory})
 
     # create an instance of a mongo document (metadata)
@@ -56,13 +56,13 @@ def insert_experimental_1d_data_document(name, input_filename=None,
 
     # Then the data is experimental, thus we should let filestore know it
     # exists, and load the PDF generating parameters into the Metadata
-    res = fsc.insert_resource(handler, input_filename)
-    fsc.insert_datum(res, file_uid)
-    x, y, params = fsc.retrieve(file_uid)
+    res = insert_resource(handler, input_filename)
+    insert_datum(res, file_uid)
+    x, y, params = retrieve(file_uid)
 
     # create an instance of a mongo document (metadata)
-    a = ProcessedData(name=name, file_uid=file_uid, data_type=data_type,
-                      exp_params=params, time=time)
+    a = OneDData(name=name, file_uid=file_uid, data_type=data_type,
+                 exp_params=params, time=time)
     # save the document
     a.save()
     return a
@@ -76,7 +76,7 @@ def insert_generated_1d_data_document(name,
                                       time=None):
     if time is None:
         time = ttime.time()
-    # at some level, you dont actually care where this thing is on disk
+
     file_uid = str(uuid4())
     if handler == 'genpdf':
         data_type = 'PDF'
@@ -100,13 +100,13 @@ def insert_generated_1d_data_document(name,
     # TODO: replace with context
     with open(file_name, 'w') as f:
         np.save(f, data)
-    res = fsc.insert_resource(handler, file_name)
-    fsc.insert_datum(res, file_uid)
+    res = insert_resource(handler, file_name)
+    insert_datum(res, file_uid)
 
     # create an instance of a mongo document (metadata)
-    a = ProcessedData(name=name, file_uid=file_uid, data_type=data_type,
-                      ase_config_id=atomic_config,
-                      exp_params=exp_params, time=time)
+    a = OneDData(name=name, file_uid=file_uid, data_type=data_type,
+                 ase_config_id=atomic_config,
+                 exp_params=exp_params, time=time)
     a.save()
     return a
 

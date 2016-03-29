@@ -1,5 +1,7 @@
 """
-ODM templates for use with metadatstore
+ODM templates for use with simdb
+Note that all the the templates get git hashes attached to them and conda lists
+when they are pulled out
 """
 import os
 from mongoengine import DynamicDocument
@@ -8,7 +10,7 @@ from mongoengine import (StringField, DictField, IntField, FloatField,
 
 DATABASE_ALIAS = 'simdb'
 
-__all__ = ['ProcessedData', 'AtomicConfig', 'Ensemble', 'Calc', 'PES',
+__all__ = ['OneDData', 'AtomicConfig', 'Ensemble', 'Calc', 'PES',
            'Simulation']
 
 
@@ -17,10 +19,12 @@ class AtomicConfig(DynamicDocument):
     file_uid = StringField(required=True, unique=True)
     time = FloatField(required=True)
     generating_comment = StringField()
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
 
-class ProcessedData(DynamicDocument):
+class OneDData(DynamicDocument):
     name = StringField(required=True)
     file_uid = StringField(required=True)
     data_type = StringField(required=True)
@@ -28,6 +32,8 @@ class ProcessedData(DynamicDocument):
     ase_config_id = ReferenceField(AtomicConfig)
     exp_params = DictField(required=True)
     time = FloatField(required=True)
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'indexes': ['_id', 'name'], 'db_alias': DATABASE_ALIAS}
 
 # TODO: Need to deal with calculators with function kwargs
@@ -37,13 +43,17 @@ class Calc(DynamicDocument):
     name = StringField(required=True)
     calculator = StringField(required=True)
     calc_kwargs = DictField(required=True)
-    target_data = ReferenceField(ProcessedData)
+    target_data = ReferenceField(OneDData)
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
 
 
 class PES(DynamicDocument):
     name = StringField(required=True)
     calc_list = ListField(required=True)
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
 
 
@@ -51,6 +61,8 @@ class Ensemble(DynamicDocument):
     name = StringField(required=True)
     ensemble = StringField(required=True)
     ensemble_kwargs = DictField(required=True)
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
 
 
@@ -85,10 +97,7 @@ class Simulation(DynamicDocument):
     end_time = ListField(default=[])
 
     # Simulation metadata results
-    iterations = ListField(default=[])
-    total_samples = ListField(default=[])
-    total_iterations = ListField(default=[])
-    leapfrog_per_iter = ListField(default=[])
-    seed = ListField(default=[])
     metadata = ListField(default=[])
+    git_hash = ListField(default=[])
+    conda_list = ListField(default=[])
     meta = {'db_alias': DATABASE_ALIAS}
