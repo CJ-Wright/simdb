@@ -8,7 +8,7 @@ from filestore.api import register_handler
 from filestore.handlers import HandlerBase
 import numpy as np
 
-from pyiid.utils import load_gr_file
+# from pyiid.utils import load_gr_file
 
 class ASEAtomsHandler(HandlerBase):
     specs = {'ase'} | HandlerBase.specs
@@ -22,7 +22,7 @@ class ASEAtomsHandler(HandlerBase):
         else:
             return ase.io.read(self.filename)
 
-
+'''
 class PDFGetX3Handler(HandlerBase):
     specs = {'pdfgetx3'} | HandlerBase.specs
 
@@ -31,7 +31,7 @@ class PDFGetX3Handler(HandlerBase):
 
     def __call__(self):
         return load_gr_file(self.filename)[1]
-
+'''
 
 class GeneratedPDFHandler(HandlerBase):
     specs = {'genpdf'} | HandlerBase.specs
@@ -41,7 +41,9 @@ class GeneratedPDFHandler(HandlerBase):
     def __call__(self):
         return np.load(self.filename)
 
-handlers = [ASEAtomsHandler, PDFGetX3Handler, GeneratedPDFHandler]
+handlers = [ASEAtomsHandler,
+            # PDFGetX3Handler,
+            GeneratedPDFHandler]
 for handler in handlers:
     for spec in handler.specs:
         register_handler(spec, handler)
