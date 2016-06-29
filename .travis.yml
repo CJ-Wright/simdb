@@ -25,6 +25,7 @@ install:
   - conda create -n testenv pip pytest python=$TRAVIS_PYTHON_VERSION pymongo six pyyaml numpy pandas jinja2 humanize doct filestore nose
   - source activate testenv
   - pip install coveralls mongoengine ase
+  - 'pip install https://github.com/CJ-Wright/pyIID/zipball/master#egg=pyIID'
   - python setup.py install
   - pip install coveralls
 
