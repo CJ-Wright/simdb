@@ -22,7 +22,7 @@ install:
   - conda config --set always_yes true
   - conda update conda --yes
   - conda config --add channels lightsource2
-  - conda create -n test1env pip pytest python=$TRAVIS_PYTHON_VERSION pymongo six pyyaml numpy pandas jinja2 humanize doct filestore nose
+  - conda create -n testenv pip pytest python=$TRAVIS_PYTHON_VERSION pymongo six pyyaml numpy pandas jinja2 humanize doct filestore nose
   - source activate testenv
   - pip install coveralls mongoengine ase
   - python setup.py install
