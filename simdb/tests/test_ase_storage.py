@@ -1,3 +1,4 @@
+from __future__ import print_function
 import simdb
 from simdb.odm_templates import AtomicConfig
 from simdb.insert import insert_atom_document
@@ -43,7 +44,7 @@ def test_traj():
     # make sure the retrieved document got something from filestore
     assert(hasattr(ret, 'file_payload'))
     # make sure the payload is equivalent to the original atoms
-    print ret.file_payload
+    print(ret.file_payload)
     assert(traj == ret.file_payload)
     # make sure that the bits that came back from filestore are a different
     # object

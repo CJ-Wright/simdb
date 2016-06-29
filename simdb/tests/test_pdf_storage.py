@@ -55,7 +55,7 @@ def test_insert_and_retrieve_actual_data():
     # make sure the retrieved document got something from filestore
     assert (hasattr(ret_pdf, 'file_payload'))
     # make sure the payload is equivalent to the original atoms
-    print ret_pdf.file_payload
+    print(ret_pdf.file_payload)
     assert (np.all(actual_gr == ret_pdf.file_payload))
     # make sure that the bits that came back from filestore are a different
     # object

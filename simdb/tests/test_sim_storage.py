@@ -134,4 +134,4 @@ def final_test():
 
     # Finally create the simulation
     sim = insert_simulation('2nm Au FF+PDF starting PES=PDF+SP', params, start_config, pes)
-    print 'simulation added, number ', sim.id
+    print('simulation added, number ', sim.id)

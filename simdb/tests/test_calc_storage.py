@@ -30,7 +30,7 @@ def test_spring():
     ret, = find_calc_document(_id=a.id)
 
     local_calc = Spring(**calc_kwargs)
-    print local_calc, ret.payload
+    print(local_calc, ret.payload)
     # make sure the retrieved document got something from filestore
     assert(hasattr(ret, 'payload'))
     # make sure the payload is equivalent to the original atoms
@@ -68,7 +68,7 @@ def test_pdfcalc_generated():
     pdf = pdfdata.file_payload
 
     local_calc = PDFCalc(obs_data=pdf, **calc_kwargs)
-    print local_calc, ret.payload
+    print(local_calc, ret.payload)
     # make sure the retrieved document got something from filestore
     assert(hasattr(ret, 'payload'))
 
@@ -80,7 +80,7 @@ def test_pdfcalc_generated():
     atoms.set_calculator(ret.payload)
     re_force = atoms.get_forces()
     re_energy = atoms.get_potential_energy()
-    print l_force, re_force
+    print(l_force, re_force)
     assert(np.all(l_force == re_force))
     assert(l_energy == re_energy)
     # make sure that the bits that came back from filestore are a different
@@ -111,10 +111,10 @@ def test_pdfcalc_cut():
     pdf = pdfdata.file_payload
 
     local_calc = PDFCalc(obs_data=pdf, **calc_kwargs)
-    print local_calc.exp_dict
+    print(local_calc.exp_dict)
     assert len(local_calc.gobs) == len(np.arange(exp_dict['rmin'], exp_dict['rmax'], exp_dict['rstep']))
 
-    print local_calc, ret.payload
+    print(local_calc, ret.payload)
     # make sure the retrieved document got something from filestore
     assert(hasattr(ret, 'payload'))
 
@@ -126,7 +126,7 @@ def test_pdfcalc_cut():
     atoms.set_calculator(ret.payload)
     re_force = atoms.get_forces()
     re_energy = atoms.get_potential_energy()
-    print l_force, re_force
+    print(l_force, re_force)
     assert(np.all(l_force == re_force))
     assert(l_energy == re_energy)
     # make sure that the bits that came back from filestore are a different
