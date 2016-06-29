@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import time as ttime
 from uuid import uuid4
@@ -116,8 +117,8 @@ def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
                 find_calc_document(name=name, calculator=calculator,
                                    calc_kwargs=calc_kwargs, calc_exp=calc_exp))
 
-        print 'Record already exists with id {}'.format(existing_calc.id)
-        print 'Returning the existing calculator'
+        print('Record already exists with id {}'.format(existing_calc.id))
+        print('Returning the existing calculator')
         return existing_calc
 
     except:
