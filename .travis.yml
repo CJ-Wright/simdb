@@ -25,7 +25,7 @@ install:
   - conda install -n testenv --yes -c soft-matter tifffile
   - conda install -n testenv --yes numpy
   - source activate testenv
-  - pip install coveralls mongoengine boltons python-ase
+  - pip install coveralls mongoengine boltons ase
   - 'pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore'
   - python setup.py install
   - pip install coveralls

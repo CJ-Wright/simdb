@@ -31,7 +31,7 @@
         "control": {
             "type": "object",
             "properties":{
-                "status": {"type": "string", "enum":["queued", "running", "finished", "errored", "skip"]},
+                "status": {"type": "string", "enum":["queued", "running", "finished", "error", "skip"]},
                 "run_args":{"type": "array"}
             },
             "description": "Flow control for the simulation"
