@@ -141,8 +141,8 @@ def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
 def insert_pes(name, calc_list, time=None):
     try:
         existing_pes = next(find_pes_document(name=name, calc_list=calc_list))
-        print 'Record already exists with id {}'.format(existing_pes.id)
-        print 'Returning the existing calculator'
+        print('Record already exists with id {}'.format(existing_pes.id))
+        print('Returning the existing calculator')
         return existing_pes
     except:
         if time is None:
