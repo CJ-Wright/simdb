@@ -1,0 +1,37 @@
+{
+    "properties": {
+        "uid": {
+            "type": "string",
+            "description": "Globally unique ID for this optimizer configuration"
+        },
+        "owner": {
+            "type": "string",
+            "description": "String descriptor to associate this simulation with. Can be user or process"
+        },
+        "time": {
+            "type": "number",
+            "description": "Time the container was created.  Unix epoch time"
+        },
+        "module": {
+            "type": "string",
+            "description": "Module address of the optimizer"
+        },
+        "object_name": {
+            "type": "string",
+            "description": "Object name of the optimizer"
+        },
+        "kwargs": {
+            "type": "object",
+            "description": "Key word arguments to the optimizer"
+        }
+    },
+    "required": [
+        "uid",
+        "time",
+        "module",
+        "object_name",
+        "kwargs"
+     ],
+    "type": "object",
+    "description": "Document created for a optimizer."
+}

@@ -1,0 +1,27 @@
+{
+    "properties": {
+        "uid": {
+            "type": "string",
+            "description": "Globally unique ID for this potential energy surface"
+        },
+        "owner": {
+            "type": "string",
+            "description": "String descriptor to associate this simulation with. Can be user or process"
+        },
+        "time": {
+            "type": "number",
+            "description": "Time the container was created.  Unix epoch time"
+        },
+        "calcs": {
+            "type": "array",
+            "description": "List of calculator uids"
+        }
+    },
+    "required": [
+        "uid",
+        "time",
+        "calcs"
+     ],
+    "type": "object",
+    "description": "Document created for a structural simulation."
+}

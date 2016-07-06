@@ -2,7 +2,7 @@
     "properties": {
         "uid": {
             "type": "string",
-            "description": "Globally unique ID for this container"
+            "description": "Globally unique ID for this simulation"
         },
         "owner": {
             "type": "string",
@@ -13,20 +13,20 @@
             "description": "Time the container was created.  Unix epoch time"
         },
         "starting": {
-            "type": "object",
-            "description": "Starting atomic configuration"
+            "type": "string",
+            "description": "Starting structure uid"
         },
         "min": {
-            "type": "object",
-            "description": "Minimum energy atomic configuration"
+            "type": "string",
+            "description": "Minimum energy structure uid"
         },
         "pes": {
-            "type": "object",
-            "description": "The Potential Energy Surface"
+            "type": "string",
+            "description": "The Potential Energy Surface uid"
         },
         "optimizer": {
             "type": "string",
-            "description": "The optimizer which will find minima"
+            "description": "The optimizer uid which will find minima"
         },
         "control": {
             "type": "object",
@@ -46,5 +46,5 @@
         "control"
      ],
     "type": "object",
-    "description": "Document created for group of containers."
+    "description": "Document created for a structural simulation."
 }
