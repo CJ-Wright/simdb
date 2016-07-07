@@ -52,7 +52,7 @@ def find_atomic_config_document(**kwargs):
     atomic_configs = AtomicConfig.objects(__raw__=kwargs).order_by(
         '-_id').all()
     for atomic_config in atomic_configs:
-        atomic_config.file_payload = fsc.retrieve(atomic_config.file_uid)
+        atomic_config.payload = fsc.retrieve(atomic_config.file_uid)
         yield atomic_config
 
 
@@ -60,7 +60,7 @@ def find_atomic_config_document(**kwargs):
 def find_1d_data_document(**kwargs):
     data_sets = ProcessedData.objects(__raw__=kwargs).order_by('-_id').all()
     for data_set in data_sets:
-        data_set.file_payload = fsc.retrieve(data_set.file_uid)
+        data_set.payload = fsc.retrieve(data_set.file_uid)
         yield data_set
 
 
@@ -114,7 +114,12 @@ def find_ensemble_document(atoms, **kwargs):
 
 
 def build_sim(sim):
-    pass
+    starting_atoms = find_atomic_config_document(_id=sim.starting)
+    pes = find_pes_document(_id=sim.pes)
+    starting_atoms.set_calculator(pes.payload)
+    opt = find_ensemble_document(atoms=starting_atoms, _id=sim.optimizer)
+    return starting_atoms, pes, opt
+
 
 @_ensure_connection
 def find_simulation_document(priority=False, **kwargs):
@@ -124,5 +129,4 @@ def find_simulation_document(priority=False, **kwargs):
     else:
         sims = Simulation.objects(__raw__=kwargs).order_by('-_id').all()
     for sim in sims:
-        # Should I build the simulation on the way out?
         yield sim

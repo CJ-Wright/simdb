@@ -22,7 +22,7 @@ install:
   - conda config --set always_yes true
   - conda update conda --yes
   - conda config --add channels lightsource2
-  - conda create -n testenv xraylib scipy python=$TRAVIS_PYTHON_VERSION jinja2 pip pymongo numba six humanize doct filestore future mpi4py nose accelerate pytest mkl pyyaml numpy matplotlib psutil pandas
+  - conda create -n testenv xraylib scipy python=$TRAVIS_PYTHON_VERSION jinja2 pip pymongo numba six humanize doct filestore future mpi4py nose accelerate pytest mkl pyyaml numpy matplotlib psutil pandas ujson
   - source activate testenv
   - pip install coveralls mongoengine ase
   - 'pip install https://github.com/CJ-Wright/pyIID/zipball/master#egg=pyIID'

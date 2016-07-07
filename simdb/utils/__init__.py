@@ -3,8 +3,11 @@ import simdb
 from mongoengine import connect
 import mongoengine
 import importlib
+from pkg_resources import resource_filename as rs_fn
+import ujson
 
 from .. import odm_templates
+
 
 def _ensure_connection(func):
     @wraps(func)
@@ -33,3 +36,18 @@ def db_connect(database, host, port):
     """Helper function to deal with stateful connections to mongoengine"""
     return connect(db=database, host=host, port=port,
                    alias=odm_templates.DATABASE_ALIAS)
+
+SCHEMA_PATH = 'schemas'
+SCHEMA_NAMES = {'calc': 'calc.json',
+                'opt': 'opt.json',
+                'pes': 'pes.json',
+                'sim': 'sim.json'}
+fn = '{}/{{}}'.format(SCHEMA_PATH)
+schemas = {}
+for name, filename in SCHEMA_NAMES.items():
+    try:
+        with open(rs_fn('simdb',
+                        resource_name=fn.format(filename))) as fin:
+            schemas[name] = ujson.load(fin)
+    except IOError:
+        raise Exception('Schema file not found or does not exist')

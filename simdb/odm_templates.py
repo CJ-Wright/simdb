@@ -32,9 +32,9 @@ class ProcessedData(DynamicDocument):
 
 class Calc(DynamicDocument):
     name = StringField(required=True)
-    calculator = StringField(required=True)
-    calc_kwargs = DictField(required=True)
-    target_data = ReferenceField(ProcessedData)
+    module = StringField(required=True)
+    object_name = StringField(required=True)
+    kwargs = DictField()
     meta = {'db_alias': DATABASE_ALIAS}
 
 
@@ -53,7 +53,7 @@ class Ensemble(DynamicDocument):
 
 class Simulation(DynamicDocument):
     # Simulation Request Part, all the inputs for a simulation
-    name = StringField(required=True)
+    name = StringField()
     starting_atoms = ReferenceField(AtomicConfig,
                                     reverse_delete_rule=DENY,
                                     required=True,

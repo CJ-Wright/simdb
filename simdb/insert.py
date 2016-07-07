@@ -4,21 +4,26 @@ import time as ttime
 from uuid import uuid4
 import simdb
 from ase import io as aseio
-from .utils import _ensure_connection
+from .utils import _ensure_connection, schemas
 from .odm_templates import *
 from filestore import commands as fsc
 from .readers.pdfgetx3_gr import load_gr_file
+from filestore.api import insert_resource, insert_datum, register_handler
+from filestore.api import db_connect as fs_db_connect
 import numpy as np
 from .search import *
+from jsonschema import validate
+import ujson
+
 
 __author__ = 'christopher'
 
 
 @_ensure_connection
-def insert_atom_document(name, ase_object, time=None):
+def insert_atom_document(name, ase_object, time=None, **kwargs):
     if time is None:
         time = ttime.time()
-    # at some level, you dont actually care where this thing is on disk
+    # at some level, you don't actually care where this thing is on disk
     file_uid = str(uuid4())
 
     is_trajectory = False
@@ -35,8 +40,10 @@ def insert_atom_document(name, ase_object, time=None):
     fsc.insert_datum(resource, file_uid,
                      datum_kwargs={'is_trajectory': is_trajectory})
 
-    # create an instance of a mongo document (metadata)
-    a = AtomicConfig(name=name, file_uid=file_uid, time=time)
+    # create an instance of a mongo document
+    # We might unpack this a little more, asedb shows that the atoms object
+    # can completely be broken down into a dict
+    a = AtomicConfig(name=name, file_uid=file_uid, time=time, **kwargs)
     # save the document
     a.save()
     return a
@@ -106,16 +113,11 @@ def insert_generated_1d_data_document(name,
 
 
 @_ensure_connection
-def insert_calc(name, calculator, calc_kwargs, calc_exp=None, time=None):
+def insert_calc(name, calculator, calc_kwargs, time=None):
     try:
-        if calc_exp is None:
-            existing_calc = next(
-                find_calc_document(name=name, calculator=calculator,
-                                   calc_kwargs=calc_kwargs))
-        else:
-            existing_calc = next(
-                find_calc_document(name=name, calculator=calculator,
-                                   calc_kwargs=calc_kwargs, calc_exp=calc_exp))
+        existing_calc = next(
+            find_calc_document(name=name, calculator=calculator,
+                               calc_kwargs=calc_kwargs))
 
         print('Record already exists with id {}'.format(existing_calc.id))
         print('Returning the existing calculator')
