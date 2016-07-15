@@ -13,7 +13,7 @@ __author__ = 'christopher'
 
 def setup():
     simdb_setup()
-    simdb.PDF_PATH = tempfile.gettempdir()
+    simdb.EXP_DATA_PATH = tempfile.gettempdir()
     simdb.ATOM_PATH = tempfile.gettempdir()
 
 

@@ -33,18 +33,7 @@ def build_obj(mod, obj_name, args=None, kwargs=None):
     # they may need to write their own scatter object
     mod = importlib.import_module(mod)
     obj = getattr(mod, obj_name)
-    if kwargs is not None:
-        for key in kwargs.keys():
-            if check_uuid(kwargs[key]):
-                kwargs[key] = fsc.retrieve(kwargs[key])
-    if kwargs is None and args is None:
-        return obj()
-    elif kwargs is None:
-        return obj(*args)
-    elif args is None:
-        return obj(**kwargs)
-    else:
-        return obj(*args, **kwargs)
+    return obj(*args, **kwargs)
 
 
 @_ensure_connection
@@ -69,6 +58,7 @@ def find_calc_document(**kwargs):
     calculators = Calc.objects(__raw__=kwargs).order_by(
         '-_id').all()
     for calc in calculators:
+        # extract/build the kwargs
         # build the calculator
         return_calc = build_obj(
             mod=calc.module,

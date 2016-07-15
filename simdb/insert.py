@@ -14,9 +14,23 @@ import numpy as np
 from .search import *
 from jsonschema import validate
 import ujson
-
+from pyiid.calc import ExpCalc
 
 __author__ = 'christopher'
+
+
+def deconstruct_class(obj):
+    mod = obj.__module__
+    obj_name = obj.__class__.__name__
+    kwargs = obj.to_dict()
+    return dict(mod=mod, obj_name=obj_name, kwargs=kwargs, type='object')
+
+
+def deconstruct_method(mthd):
+    d = deconstruct_class(mthd.im_class)
+    d['method_name'] = mthd.__name__
+    d['type'] = 'method'
+    return d
 
 
 @_ensure_connection
@@ -53,7 +67,7 @@ def insert_atom_document(name, ase_object, time=None, **kwargs):
 def insert_experimental_1d_data_document(name, input_filename=None,
                                          parameter_function=None,
                                          filestore_handle='pdfgetx3',
-                                         time=None):
+                                         time=None, md=None):
     if time is None:
         time = ttime.time()
     # at some level, you dont actually care where this thing is on disk
@@ -66,9 +80,11 @@ def insert_experimental_1d_data_document(name, input_filename=None,
     params = parameter_function(input_filename)
 
     # create an instance of a mongo document (metadata)
+    # TODO: we should set this up so it can also eat analysisstore stuff
     a = ProcessedData(name=name, file_uid=file_uid,
                       # experiment_uid=exp_uid,
-                      exp_params=params, time=time)
+                      exp_params=params, time=time,
+                      **md)
     # save the document
     a.save()
     return a
@@ -85,7 +101,7 @@ def insert_generated_1d_data_document(name,
     # at some level, you dont actually care where this thing is on disk
     file_uid = str(uuid4())
     # create the filename
-    file_name = os.path.join(simdb.PDF_PATH, file_uid + '.gr')
+    file_name = os.path.join(simdb.EXP_DATA_PATH, file_uid + '.gr')
 
     # get the atomic configuration from the DB
     atomic_doc, = find_atomic_config_document(_id=atomic_config.id)
@@ -113,7 +129,20 @@ def insert_generated_1d_data_document(name,
 
 
 @_ensure_connection
-def insert_calc(name, calculator, calc_kwargs, time=None):
+def insert_calc(name, calculator, time=None):
+    calc_kwargs = calculator.to_dict()
+    if isinstance(calculator, ExpCalc):
+        # save the target data
+        file_uid = str(uuid4())
+        file_name = os.path.join(simdb.ATOM_PATH, file_uid)
+        resource = fsc.insert_resource('numpy', file_name)
+        fsc.insert_datum(resource, file_uid)
+        calc_kwargs['target_data'] = file_uid
+
+        # store the methods and object in the kwargs
+        for k, v in calc_kwargs.items():
+            if hasattr(v, '__call__'):
+                calc_kwargs[k] = deconstruct_method(v)
     try:
         existing_calc = next(
             find_calc_document(name=name, calculator=calculator,
@@ -126,14 +155,11 @@ def insert_calc(name, calculator, calc_kwargs, time=None):
     except:
         if time is None:
             time = ttime.time()
-        if calc_exp is not None:
-            calc = Calc(name=name, calculator=calculator,
-                        calc_kwargs=calc_kwargs,
-                        calc_exp=calc_exp, time=time)
-        else:
-            calc = Calc(name=name, calculator=calculator,
-                        calc_kwargs=calc_kwargs,
-                        time=time)
+
+        calc = Calc(name=name, module=calculator.__module__,
+                    object_name=calculator.__class__.__name__,
+                    kwargs=calc_kwargs,
+                    time=time)
         # save the document
         calc.save(validate=True, write_concern={"w": 1})
         return calc
@@ -167,7 +193,8 @@ def insert_simulation(name, starting_atoms, pes, ensemble, skip=False,
     else:
         iteration = [iterations]
     sp = Simulation(name=name, starting_atoms=starting_atoms,
-                    ensemble=ensemble, pes=pes, iterations=iteration, skip=skip)
+                    ensemble=ensemble, pes=pes, iterations=iteration,
+                    skip=skip)
     # save the document
     sp.save(validate=True, write_concern={"w": 1})
     return sp
